@@ -72,7 +72,7 @@ void    draw_intMap(t_intMap *map)
     }
 }
 
-void    generate_random_intMap(t_intMap *map, int occ)
+void    generate_random_intMap(t_intMap *map, int max_val, int occ)
 {
     int x = 0;
     int y = 0;
@@ -82,7 +82,7 @@ void    generate_random_intMap(t_intMap *map, int occ)
         while (x < map->w)
         {
             if (GetRandomValue(0, occ) == 0)
-                map->map[y][x] = 1;
+                map->map[y][x] = GetRandomValue(0, max_val);
             x++;
         }
         y++;

@@ -68,7 +68,7 @@ t_ray_info  *cast_rays(t_intMap *map, t_player *player, unsigned int out_w)
 
                 if (map_x >= map->w || map_y >= map->h)
                     collide = true;
-                else if (map->map[map_y][map_x] == 1)
+                else if (map->map[map_y][map_x] != 0)
                 {
                     collide = true;
                     map_id[0] = map_x;
@@ -132,7 +132,7 @@ t_ray_info  *cast_rays(t_intMap *map, t_player *player, unsigned int out_w)
 
                 if (map_x >= map->w || map_y >= map->h)
                     collide = true;
-                else if (map->map[map_y][map_x] == 1)
+                else if (map->map[map_y][map_x] != 0)
                 {
                     collide = true;
                     map_id[2] = map_x;
@@ -182,6 +182,10 @@ t_ray_info  *cast_rays(t_intMap *map, t_player *player, unsigned int out_w)
             ray_info[i].map_coll_y = map_id[1];
             ray_info[i].texture_off = texture_off_h;
         }
+        if (ray_info[i].map_coll_x >= map->w || ray_info[i].map_coll_y >= map->h)
+            ray_info[i].map_coll_val = 0;
+        else
+            ray_info[i].map_coll_val = map->map[ray_info[i].map_coll_y][ray_info[i].map_coll_x];
 
         float   diff_dir_pdir = dir - player->dir;
         correct_dir(&diff_dir_pdir);
@@ -197,22 +201,37 @@ t_ray_info  *cast_rays(t_intMap *map, t_player *player, unsigned int out_w)
     return ray_info;
 }
 
-void    render_ray_infos_to_img(t_ray_info *ray_infos, Image *img, int scale)
+void    render_ray_infos_to_img(t_ray_info *ray_infos, Image *img, Image *wall_imgs, int scale)
 {
     ImageClearBackground(img, BLACK);
     for (int i = 0; i < img->width; i++)
     {
         float line_h = (img->height * scale) / ray_infos[i].length;
-        if (line_h > img->height)
-            line_h = img->height;
+        //if (line_h > img->height)
+        //    line_h = img->height;
+
+        Image   *curr_img = NULL;
+
+        if (ray_infos[i].map_coll_val != 0)
+            curr_img = &wall_imgs[ray_infos[i].map_coll_val - 1];
+        else
+            continue;
+        int wall_img_x = (ray_infos[i].texture_off * (curr_img->width - 1)) / scale;
+        for (int j = 0; j < (int)line_h; j++)
+        {
+            int wall_img_y = (j * curr_img->height) / line_h;
+            Color   col = WHITE;
+            if (wall_img_y < curr_img->height && wall_img_x < curr_img->width)
+                col = GetImageColor(*curr_img, wall_img_x, wall_img_y);
+            if (ray_infos[i].coll_dir == NORTH || ray_infos[i].coll_dir == SOUTH)
+            {
+                col.r /= 1.5;
+                col.g /= 1.5;
+                col.b /= 1.5;
+            }
+            ImageDrawPixel(img, i, (img->height / 2) - (line_h / 2) + j, col);
+        }
         /*
-        Color   col = {
-            .r = (line_h * 255) / img->height,
-            .g = (line_h * 255) / img->height,
-            .b = (line_h * 255) / img->height,
-            .a = 255
-        };
-        */
         Color col = WHITE;
         if (ray_infos[i].coll_dir == NORTH || ray_infos[i].coll_dir == SOUTH)
         {
@@ -222,5 +241,6 @@ void    render_ray_infos_to_img(t_ray_info *ray_infos, Image *img, int scale)
         }
         col.r = (ray_infos[i].texture_off * 255) / 64;
         ImageDrawLine(img, i, (img->height / 2) - (line_h / 2), i, (img->height / 2) + (line_h / 2), col);
+        */
     }
 }
