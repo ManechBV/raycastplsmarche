@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 
-t_intMap    *create_intMap(unsigned int w, unsigned int h)
+t_intMap    *create_intMap(unsigned int w, unsigned int h, int scale)
 {
     t_intMap    *new;
 
@@ -12,6 +12,7 @@ t_intMap    *create_intMap(unsigned int w, unsigned int h)
         return (NULL);
     new->w = w;
     new->h = h;
+    new->scale = scale;
     new->map = malloc(sizeof(int *) * h);
     if (!new->map) 
     {
@@ -38,10 +39,19 @@ t_intMap    *create_intMap(unsigned int w, unsigned int h)
     return (new);
 }
 
-void    draw_intMap(t_intMap *map, int scale)
+void    free_intMap(t_intMap *map)
+{
+    for (int i = 0; i < map->h; i++)
+        free(map->map[i]);
+    free(map->map);
+    free(map);
+}
+
+void    draw_intMap(t_intMap *map)
 {
     int x = 0;
     int y = 0;
+    int scale = map->scale;
     Color   col = {
         .r = 255, .g = 255, .b = 255, .a = 255
     };
@@ -76,5 +86,17 @@ void    generate_random_intMap(t_intMap *map, int occ)
             x++;
         }
         y++;
+    }
+}
+
+void    generate_border_walls(t_intMap *map)
+{
+    for (int y = 0; y < map->h; y++)
+    {
+        for (int x = 0; x < map->w; x++)
+        {
+            if (x == 0 || y == 0 || x == map->w - 1 || y == map->h - 1)
+                map->map[y][x] = 1;
+        }
     }
 }
