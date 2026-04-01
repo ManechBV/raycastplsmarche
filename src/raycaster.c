@@ -25,10 +25,14 @@ t_ray_info  *cast_rays(t_intMap *map, t_player *player, unsigned int out_w)
     for (int i = 0; i < out_w; i++)
     {
         correct_dir(&dir);
-        float       h_len;
-        float       v_len;
-        t_coll_dir  coll_dir_h;
-        t_coll_dir  coll_dir_v;
+        float           h_len;
+        float           v_len;
+        t_coll_dir      coll_dir_h;
+        t_coll_dir      coll_dir_v;
+        int             map_id[4];
+        unsigned int    texture_off_v;
+        unsigned int    texture_off_h;
+
         x = player->x;
         y = player->y;
         // horizontal check
@@ -65,7 +69,16 @@ t_ray_info  *cast_rays(t_intMap *map, t_player *player, unsigned int out_w)
                 if (map_x >= map->w || map_y >= map->h)
                     collide = true;
                 else if (map->map[map_y][map_x] == 1)
+                {
                     collide = true;
+                    map_id[0] = map_x;
+                    map_id[1] = map_y;
+
+                    if (dir > deg_to_rad(90) && dir < deg_to_rad(270))
+                        texture_off_h = (unsigned int)x % (unsigned int)map->scale;
+                    else
+                        texture_off_h = map->scale - ((unsigned int)x % (unsigned int)map->scale);
+                }
                 else
                 {
                     if (dir > deg_to_rad(90) && dir < deg_to_rad(270))
@@ -120,7 +133,15 @@ t_ray_info  *cast_rays(t_intMap *map, t_player *player, unsigned int out_w)
                 if (map_x >= map->w || map_y >= map->h)
                     collide = true;
                 else if (map->map[map_y][map_x] == 1)
+                {
                     collide = true;
+                    map_id[2] = map_x;
+                    map_id[3] = map_y;
+                    if (dir > deg_to_rad(180))
+                        texture_off_v = map->scale - ((unsigned int)y % (unsigned int)map->scale);
+                    else
+                        texture_off_v = (unsigned int)y % (unsigned int)map->scale;
+                }
                 else
                 {
                     if (dir > deg_to_rad(180))
@@ -149,11 +170,17 @@ t_ray_info  *cast_rays(t_intMap *map, t_player *player, unsigned int out_w)
         {
             ray_info[i].length = v_len;
             ray_info[i].coll_dir = coll_dir_v;
+            ray_info[i].map_coll_x = map_id[2];
+            ray_info[i].map_coll_y = map_id[3];
+            ray_info[i].texture_off = texture_off_v;
         }
         else
         {
             ray_info[i].length = h_len;
             ray_info[i].coll_dir = coll_dir_h;
+            ray_info[i].map_coll_x = map_id[0];
+            ray_info[i].map_coll_y = map_id[1];
+            ray_info[i].texture_off = texture_off_h;
         }
 
         float   diff_dir_pdir = dir - player->dir;
@@ -193,6 +220,7 @@ void    render_ray_infos_to_img(t_ray_info *ray_infos, Image *img, int scale)
             col.g /= 1.2;
             col.b /= 1.2;
         }
+        col.r = (ray_infos[i].texture_off * 255) / 64;
         ImageDrawLine(img, i, (img->height / 2) - (line_h / 2), i, (img->height / 2) + (line_h / 2), col);
     }
 }
