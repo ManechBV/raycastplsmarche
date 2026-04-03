@@ -5,8 +5,8 @@
 #include <math.h>
 
 #define SCALE 64
-#define OUT_W 640
-#define OUT_H 360
+#define OUT_W 1280
+#define OUT_H 720
 
 #include "utils.h"
 #include "intMap.h"
@@ -26,7 +26,7 @@ int main(void)
     generate_border_walls(Map);
 
     t_player    *Player;
-    Player = create_player(200.0f, 200.0f, 0.0f, deg_to_rad(90.0f)); 
+    Player = create_player(200.0f, 200.0f, 0.0f, deg_to_rad(80.0f)); 
     if (!Player)   return (-1);
 
     t_ray_info  *ray_infos;
@@ -55,7 +55,7 @@ int main(void)
             ClearBackground(BLACK);
             //draw_intMap(Map);
             //draw_player(Player);
-            DrawTextureEx(render_texture, (Vector2){0, 0}, 0.0, 2.0, WHITE);
+            DrawTextureEx(render_texture, (Vector2){0, 0}, 0.0, 1.0, WHITE);
         EndDrawing();
     }
 

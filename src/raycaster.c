@@ -235,6 +235,8 @@ void    render_ray_infos_to_img(t_ray_info *ray_infos, Image *img, Image *wall_i
         else
             continue;
         int wall_img_x = (ray_infos[i].texture_off * (float)(curr_img->width)) / (float)scale;
+        if (wall_img_x > 64)
+            printf("dsqf\n");
         for (int j = 0; j < img->height; j++)
         {
             if (j > (img->height / 2) - (line_h / 2) && j < (img->height / 2) + (line_h / 2))
