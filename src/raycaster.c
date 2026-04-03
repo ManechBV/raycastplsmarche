@@ -234,7 +234,7 @@ void    render_ray_infos_to_img(t_ray_info *ray_infos, Image *img, Image *wall_i
             curr_img = &wall_imgs[ray_infos[i].map_coll_val - 1];
         else
             continue;
-        int wall_img_x = (ray_infos[i].texture_off * (float)(curr_img->width - 1)) / (float)scale;
+        int wall_img_x = (ray_infos[i].texture_off * (float)(curr_img->width)) / (float)scale;
         for (int j = 0; j < img->height; j++)
         {
             if (j > (img->height / 2) - (line_h / 2) && j < (img->height / 2) + (line_h / 2))

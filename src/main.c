@@ -22,20 +22,25 @@ int main(void)
     Map = create_intMap(16, 16, SCALE);
     if (!Map)   return (-1);
 
-    generate_random_intMap(Map, 1, 4);
+    generate_random_intMap(Map, 6, 4);
     generate_border_walls(Map);
 
     t_player    *Player;
-    Player = create_player(200.0f, 200.0f, 0.0f, deg_to_rad(60.0f)); 
+    Player = create_player(200.0f, 200.0f, 0.0f, deg_to_rad(90.0f)); 
     if (!Player)   return (-1);
 
     t_ray_info  *ray_infos;
     Image       out_img = GenImageColor(OUT_W, OUT_H, GRAY);
     Texture2D   render_texture = LoadTextureFromImage(out_img);
 
-    Image   wall_imgs[2] = {
-        //LoadImage("res/wallhd.png"),
-        LoadImage("res/jonkler.jpg")
+    Image   wall_imgs[7] = {
+        LoadImage("res/backrooms_texture_0.png"),
+        LoadImage("res/backrooms_texture_1.png"),
+        LoadImage("res/backrooms_texture_2.png"),
+        LoadImage("res/backrooms_texture_3.png"),
+        LoadImage("res/backrooms_texture_4.png"),
+        LoadImage("res/backrooms_texture_5.png"),
+        LoadImage("res/backrooms_texture_6.png")
     };
 
     while (!WindowShouldClose())
