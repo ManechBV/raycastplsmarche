@@ -22,7 +22,7 @@ int main(void)
     Map = create_intMap(16, 16, SCALE);
     if (!Map)   return (-1);
 
-    generate_random_intMap(Map, 2, 4);
+    generate_random_intMap(Map, 1, 4);
     generate_border_walls(Map);
 
     t_player    *Player;
@@ -34,7 +34,7 @@ int main(void)
     Texture2D   render_texture = LoadTextureFromImage(out_img);
 
     Image   wall_imgs[2] = {
-        LoadImage("res/wallhd.png"),
+        //LoadImage("res/wallhd.png"),
         LoadImage("res/jonkler.jpg")
     };
 

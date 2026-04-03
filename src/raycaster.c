@@ -30,8 +30,8 @@ t_ray_info  *cast_rays(t_intMap *map, t_player *player, unsigned int out_w)
         t_coll_dir      coll_dir_h;
         t_coll_dir      coll_dir_v;
         int             map_id[4];
-        unsigned int    texture_off_v;
-        unsigned int    texture_off_h;
+        float           texture_off_v;
+        float           texture_off_h;
 
         x = player->x;
         y = player->y;
@@ -75,9 +75,18 @@ t_ray_info  *cast_rays(t_intMap *map, t_player *player, unsigned int out_w)
                     map_id[1] = map_y;
 
                     if (dir > deg_to_rad(90) && dir < deg_to_rad(270))
-                        texture_off_h = (unsigned int)x % (unsigned int)map->scale;
+                    {
+                        texture_off_h = x;
+                        while (texture_off_h > map->scale)
+                            texture_off_h -= (float)map->scale;
+                    }
                     else
-                        texture_off_h = map->scale - ((unsigned int)x % (unsigned int)map->scale);
+                    {
+                        texture_off_h = x;
+                        while (texture_off_h > map->scale)
+                            texture_off_h -= (float)map->scale;
+                        texture_off_h = (float)map->scale - texture_off_h;
+                    }
                 }
                 else
                 {
@@ -138,9 +147,18 @@ t_ray_info  *cast_rays(t_intMap *map, t_player *player, unsigned int out_w)
                     map_id[2] = map_x;
                     map_id[3] = map_y;
                     if (dir > deg_to_rad(180))
-                        texture_off_v = map->scale - ((unsigned int)y % (unsigned int)map->scale);
+                    {
+                        texture_off_v = y;
+                        while (texture_off_v > map->scale)
+                            texture_off_v -= (float)map->scale;
+                        texture_off_v = (float)map->scale - texture_off_v;
+                    }
                     else
-                        texture_off_v = (unsigned int)y % (unsigned int)map->scale;
+                    {
+                        texture_off_v = y;
+                        while (texture_off_v > map->scale)
+                            texture_off_v -= (float)map->scale;
+                    }
                 }
                 else
                 {
@@ -216,31 +234,35 @@ void    render_ray_infos_to_img(t_ray_info *ray_infos, Image *img, Image *wall_i
             curr_img = &wall_imgs[ray_infos[i].map_coll_val - 1];
         else
             continue;
-        int wall_img_x = (ray_infos[i].texture_off * (curr_img->width - 1)) / scale;
-        for (int j = 0; j < (int)line_h; j++)
+        int wall_img_x = (ray_infos[i].texture_off * (float)(curr_img->width - 1)) / (float)scale;
+        for (int j = 0; j < img->height; j++)
         {
-            int wall_img_y = (j * curr_img->height) / line_h;
-            Color   col = WHITE;
-            if (wall_img_y < curr_img->height && wall_img_x < curr_img->width)
-                col = GetImageColor(*curr_img, wall_img_x, wall_img_y);
-            if (ray_infos[i].coll_dir == NORTH || ray_infos[i].coll_dir == SOUTH)
+            if (j > (img->height / 2) - (line_h / 2) && j < (img->height / 2) + (line_h / 2))
             {
-                col.r /= 1.5;
-                col.g /= 1.5;
-                col.b /= 1.5;
+                int wall_img_y = ((j - (img->height / 2) + (line_h / 2)) * curr_img->height) / line_h;
+                
+                Color   col = WHITE;
+                if (wall_img_y < curr_img->height && wall_img_x < curr_img->width)
+                    col = GetImageColor(*curr_img, wall_img_x, wall_img_y);
+                if (ray_infos[i].coll_dir == NORTH || ray_infos[i].coll_dir == SOUTH)
+                {
+                    col.r /= 1.5;
+                    col.g /= 1.5;
+                    col.b /= 1.5;
+                }
+                ImageDrawPixel(img, i, j, col);
             }
-            ImageDrawPixel(img, i, (img->height / 2) - (line_h / 2) + j, col);
         }
         /*
-        Color col = WHITE;
-        if (ray_infos[i].coll_dir == NORTH || ray_infos[i].coll_dir == SOUTH)
-        {
-            col.r /= 1.2;
-            col.g /= 1.2;
-            col.b /= 1.2;
-        }
-        col.r = (ray_infos[i].texture_off * 255) / 64;
-        ImageDrawLine(img, i, (img->height / 2) - (line_h / 2), i, (img->height / 2) + (line_h / 2), col);
-        */
+           Color col = WHITE;
+           if (ray_infos[i].coll_dir == NORTH || ray_infos[i].coll_dir == SOUTH)
+           {
+           col.r /= 1.2;
+           col.g /= 1.2;
+           col.b /= 1.2;
+           }
+           col.r = (ray_infos[i].texture_off * 255) / 64;
+           ImageDrawLine(img, i, (img->height / 2) - (line_h / 2), i, (img->height / 2) + (line_h / 2), col);
+           */
     }
 }

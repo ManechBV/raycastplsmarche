@@ -19,7 +19,7 @@ typedef struct  s_ray_info
     int             map_coll_x;
     int             map_coll_y;
     int             map_coll_val;
-    unsigned int    texture_off;
+    float           texture_off;
     t_coll_dir      coll_dir;
 }   t_ray_info;
 
